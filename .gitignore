@@ -170,6 +170,7 @@ notebooks/
 hostfile
 .vscode/
 examples/.file_cache.npy
+examples
 
 # Nsight Systems output
 *.nsys-rep

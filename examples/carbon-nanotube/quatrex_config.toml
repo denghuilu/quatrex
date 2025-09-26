@@ -4,7 +4,7 @@ simulation_dir = "."
 transport_direction = 'x'
 
 [scba] # ===============================================================
-max_iterations = 2
+max_iterations = 20
 mixing_factor = 0.5
 
 coulomb_screening = true 
@@ -43,8 +43,8 @@ band_edge_tracking = "eigenvalues"
 # Energy grid.
 energy_window_min = -10
 energy_window_max = 8
-# # energy_window_num = 256
-energy_window_num_per_rank = 4
+energy_window_num = 2048
+# energy_window_num_per_rank = 4
 
 solver.algorithm = "rgf"
 solver.max_batch_size = 1000

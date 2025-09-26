@@ -37,7 +37,6 @@ dependencies:
   - kiwisolver=1.4.8
   - krb5=1.20.1
   - lcms2=2.16
-  - ld_impl_linux-64=2.40
   - lerc=4.0.0
   - libabseil=20250127.0
   - libavif=1.1.1
