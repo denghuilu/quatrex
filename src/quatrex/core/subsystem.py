@@ -54,7 +54,7 @@ class SubsystemSolver(ABC):
             getattr(quatrex_config, self.system).lyapunov, compute_config
         )
         self.solver = self._configure_solver(
-            getattr(quatrex_config, self.system).solver
+            getattr(quatrex_config, self.system).solver, compute_config
         )
         self.solver_dist = RGFDist(
             max_batch_size=getattr(quatrex_config, self.system).solver.max_batch_size,
@@ -203,13 +203,15 @@ class SubsystemSolver(ABC):
             )
         return lyapunov_solver
 
-    def _configure_solver(self, solver_config: SolverConfig) -> GFSolver:
+    def _configure_solver(self, solver_config: SolverConfig, compute_config: ComputeConfig) -> GFSolver:
         """Configures the solver algorithm from the config.
 
         Parameters
         ----------
         solver : SolverConfig
             The solver configuration.
+        compute_config : ComputeConfig
+            The compute configuration.
 
         Returns
         -------
@@ -218,7 +220,7 @@ class SubsystemSolver(ABC):
 
         """
         if solver_config.algorithm == "rgf":
-            return RGF(max_batch_size=solver_config.max_batch_size)
+            return RGF(max_batch_size=solver_config.max_batch_size, mask=compute_config.mixed_precision.rgf_mask)
 
         if solver_config.algorithm == "inv":
             return Inv(max_batch_size=solver_config.max_batch_size)

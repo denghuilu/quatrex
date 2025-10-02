@@ -6,9 +6,7 @@ from qttools import NDArray, sparse, xp
 from qttools.datastructures.dsdbsparse import DSDBSparse
 from qttools.datastructures.routines import (
     BlockMatrix,
-    bd_matmul_distr,
-    real_gemm_high_precision,
-)
+    bd_matmul_distr)
 from qttools.profiling import Profiler
 
 profiler = Profiler()
@@ -144,18 +142,14 @@ def product_sparsity_pattern_dsdbsparse(
             if start_block == 0:
                 # Left spillover
                 for i in range(a_num_diag // 2):
-                                                            c_[i, 0] += real_gemm_high_precision(
-                        a_[i + 1, 0].real, b_[0, 1].real
-                    )
+                    c_[i, 0] += a_[i + 1, 0].real @ b_[0, 1].real
 
             if end_block == num_blocks:
                 # Right spillover
                 for i in range(a_num_diag // 2):
                     c_[num_blocks - i - 1, num_blocks - 1] += (
-                                                                        real_gemm_high_precision(
-                            a_[num_blocks - i - 2, num_blocks - 1].real,
-                            b_[num_blocks - 1, num_blocks - 2].real,
-                        )
+                        a_[num_blocks - i - 2, num_blocks - 1].real @
+                        b_[num_blocks - 1, num_blocks - 2].real
                     )
 
         a_ = c_

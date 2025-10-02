@@ -107,6 +107,8 @@ class SCBAData:
         if comm.rank == 0:
             print(f"Max Interaction Cutoff: {max_interaction_cutoff}", flush=True)
 
+        self.dtype = xp.complex64 if compute_config.mixed_precision.precision == "mix" else xp.complex128
+
         # Determine the local slice of the data.
         # NOTE: This is arrow-wise partitioning.
         # TODO: Allow more options, e.g., block row-wise partitioning.
@@ -139,18 +141,20 @@ class SCBAData:
         dsdbsparse_type = compute_config.dsdbsparse_type
 
         self.g_retarded = dsdbsparse_type.from_sparray(
-            self.sparsity_pattern.astype(xp.complex128),
+            self.sparsity_pattern.astype(self.dtype),
             block_sizes=block_sizes,
             global_stack_shape=electron_energies.shape,
+            dtype=self.dtype,
         )
         self.g_retarded.data[:] = 0.0  # Initialize to zero.
 
         self.g_lesser = dsdbsparse_type.from_sparray(
-            self.sparsity_pattern.astype(xp.complex128),
+            self.sparsity_pattern.astype(self.dtype),
             block_sizes=block_sizes,
             global_stack_shape=electron_energies.shape,
             symmetry=quatrex_config.scba.symmetric,
             symmetry_op=lambda a: -a.conj(),
+            dtype=self.dtype,
         )
         self.g_greater = dsdbsparse_type.zeros_like(self.g_lesser)
 
@@ -190,11 +194,12 @@ class SCBAData:
             )
 
             self.w_lesser = dsdbsparse_type.from_sparray(
-                self.sparsity_pattern.astype(xp.complex128),
+                self.sparsity_pattern.astype(self.dtype),
                 block_sizes=coulomb_screening_block_sizes,
                 global_stack_shape=electron_energies.shape,
                 symmetry=quatrex_config.scba.symmetric,
                 symmetry_op=lambda a: -a.conj(),
+                dtype=self.dtype
             )
             self.w_greater = dsdbsparse_type.zeros_like(self.w_lesser)
 
@@ -360,6 +365,7 @@ class SCBA:
             self.compute_config,
             self.electron_energies,
             sparsity_pattern=self.data.sparsity_pattern,
+            dtype=self.data.dtype,
         )
 
         # ----- Coulomb screening --------------------------------------
@@ -393,6 +399,7 @@ class SCBA:
                 self.compute_config,
                 self.coulomb_screening_energies,
                 sparsity_pattern=self.data.sparsity_pattern,
+                dtype=self.data.dtype
             )
             self.sigma_coulomb_screening = SigmaCoulombScreening(
                 self.quatrex_config,
