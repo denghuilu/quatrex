@@ -107,7 +107,7 @@ class SCBAData:
         if comm.rank == 0:
             print(f"Max Interaction Cutoff: {max_interaction_cutoff}", flush=True)
 
-        self.dtype = xp.complex64 if compute_config.mixed_precision.precision == "mix" else xp.complex128
+        self.dtype = xp.complex64 if compute_config.mixed_precision.precision == "single" else xp.complex128
 
         # Determine the local slice of the data.
         # NOTE: This is arrow-wise partitioning.
